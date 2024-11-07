@@ -5,6 +5,8 @@ import styles from '../styles/Home.module.css'
 export default function Home() {
   const [ todo , setTodo ] =useState([])
   const [ todos , setTodos ] = useState([])
+  const [ id , setId ] = useState("")
+  const [ title , setTitle ] = useState("")
   useEffect(()=>{
     async function fetchData(params) {
       const res = await fetch("/api/todos")
@@ -19,6 +21,31 @@ export default function Home() {
     const res = await fetch("/api/todos", {
       method: "DELETE",
     });
+    const data = await res.json()
+    setTodos(data.data)
+  }
+
+  const editHandler = async()=>{
+    const res = await fetch(`/api/todos/${id}`,{
+      method:"PATCH",
+      body: JSON.stringify({todo:title}),
+      headers:{"Content-Type": "application/json"},
+    })
+    const data = await res.json()
+    setTodos(data)
+    console.log(data);
+  }
+
+
+  const replaceHandler = async ()=>{
+    const res = await fetch("/api/todos",{
+      method:"PUT",
+      body: JSON.stringify([
+        {id:7, todo:"todo N7"},
+        {id:8, todo:"todo N8"},
+      ]),
+      headers: {"Content-Type":"application/json"},
+    })
     const data = await res.json()
     setTodos(data.data)
   }
@@ -43,6 +70,14 @@ export default function Home() {
       </div>
       <div className={styles.delete}>
         <button onClick={deleteHandler}>Delete All</button>
+      </div>
+      <div className={styles.replace}>
+        <button onClick={replaceHandler}>Replace</button>
+      </div>
+      <div className={styles.Patch}>
+        <input placeholder='id'  value={id} onChange={e =>setId(e.target.value)}/>
+        <input placeholder='title'  value={title} onChange={e =>setTitle(e.target.value)}/>
+        <button onClick={editHandler}>Edit</button>
       </div>
     </div>
 
